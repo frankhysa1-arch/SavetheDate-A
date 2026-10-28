@@ -17,7 +17,10 @@ export function readDataJson<T>(name: string): T | null {
     path.join(process.cwd(), "tests", "backend", "fixtures", name),
   ];
   for (const file of candidates) {
-    if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, "utf8")) as T;
+    // turbopackIgnore: these paths are read at runtime, so Next must not trace the whole project for them.
+    if (fs.existsSync(/* turbopackIgnore: true */ file)) {
+      return JSON.parse(fs.readFileSync(/* turbopackIgnore: true */ file, "utf8")) as T;
+    }
   }
   return null;
 }

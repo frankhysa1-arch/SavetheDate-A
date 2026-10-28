@@ -1,10 +1,15 @@
+import Database from "better-sqlite3";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
-  getMember, listRatings, listVotes, removeCandidate, saveBallot, saveRun, teamAvgRatings, updateMemberPrefs,
-  upsertRating,
+  getMember, getRun, latestRun, listRatings, listVotes, openDb, removeCandidate, saveBallot, saveRun, teamAvgRatings,
+  updateMemberPrefs, upsertRating,
 } from "@/lib/db";
 import type { Db } from "@/lib/db";
 import { seed } from "@/lib/seed";
+import type { Activity, Run } from "@/lib/types";
 import { candidate, useTestEnv } from "./helpers";
 
 let db: Db;
@@ -13,7 +18,7 @@ beforeEach(() => ({ db, cleanup } = useTestEnv()));
 afterEach(() => cleanup());
 
 const count = (table: string) => (db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get() as { n: number }).n;
-const run = { id: "r1", createdAt: "2026-10-28T10:00:00.000Z", candidates: [candidate("c1"), candidate("c2"), candidate("c3")], emptyCategories: [] };
+const run: Run = { id: "r1", createdAt: "2026-10-28T10:00:00.000Z", candidates: [candidate("c1"), candidate("c2"), candidate("c3")], emptyCategories: [], discovered: [] };
 
 describe("seed", () => {
   it("is idempotent and never overwrites edited preferences", () => {
@@ -40,6 +45,30 @@ describe("ratings", () => {
 
   it("rejects out-of-range scores at the database level", () => {
     expect(() => upsertRating(db, "e1", "m1", 6)).toThrow();
+  });
+});
+
+describe("runs and contract v2 discovered activities", () => {
+  const disc: Activity = { id: "disc:abc1234567", name: "Rooftop Yoga", category: "wellness", tags: [], indoor: false, pricePerPerson: 15, priceIsEstimate: true, sourceUrl: "https://example.com/yoga" };
+
+  it("round-trips discovered activities and returns the latest run", () => {
+    saveRun(db, { ...run, id: "r2", createdAt: "2026-10-29T10:00:00.000Z", discovered: [disc] });
+    expect(getRun(db, "r2")?.discovered).toEqual([disc]);
+    expect(latestRun(db)?.id).toBe("r2");
+  });
+
+  it("migrates a run table created before v2 and reads old rows with discovered: []", () => {
+    const file = path.join(os.tmpdir(), `savethedate-migrate-${process.pid}.db`);
+    fs.rmSync(file, { force: true });
+    const legacy = new Database(file);
+    legacy.exec("CREATE TABLE run (id TEXT PRIMARY KEY, created_at TEXT NOT NULL, candidates TEXT NOT NULL, empty_categories TEXT NOT NULL DEFAULT '[]')");
+    legacy.prepare("INSERT INTO run (id, created_at, candidates) VALUES ('old', '2026-10-01T00:00:00.000Z', '[]')").run();
+    legacy.close();
+    const migrated = openDb(file); // runs migrate()
+    expect(getRun(migrated, "old")?.discovered).toEqual([]);
+    openDb(file).close(); // second open is a no-op
+    migrated.close();
+    fs.rmSync(file, { force: true });
   });
 });
 

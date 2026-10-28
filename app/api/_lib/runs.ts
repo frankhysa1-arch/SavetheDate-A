@@ -25,7 +25,13 @@ export async function createRun(db: Db): Promise<Run> {
   };
   const result = planCandidates(ctx);
   const candidates = await explain(result.candidates, { activities, members });
-  const run: Run = { id: randomUUID(), createdAt: ctx.now, candidates, emptyCategories: result.emptyCategories };
+  const run: Run = {
+    id: randomUUID(),
+    createdAt: ctx.now,
+    candidates,
+    emptyCategories: result.emptyCategories,
+    discovered: result.discovered,
+  };
   saveRun(db, run);
   return run;
 }

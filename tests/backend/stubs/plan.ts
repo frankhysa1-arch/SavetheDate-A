@@ -45,5 +45,5 @@ export function planCandidates(ctx: PlanContext): PlanResult {
       sourceUrl: a.sourceUrl,
     });
   }
-  return { candidates, emptyCategories: CATEGORIES.filter((c) => !perCategory.has(c)) };
+  return { candidates, emptyCategories: CATEGORIES.filter((c) => !perCategory.has(c)), discovered: [] };
 }

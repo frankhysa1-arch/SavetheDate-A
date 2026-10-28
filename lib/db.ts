@@ -4,7 +4,7 @@ import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
 import { seed } from "@/lib/seed"; // cycle with seed.ts is safe: each only calls the other inside functions
-import type { Candidate, Category, Member, PastEvent, Rating, Run } from "@/lib/types";
+import type { Activity, Candidate, Category, Member, PastEvent, Rating, Run } from "@/lib/types";
 
 export type Db = Database.Database;
 
@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS run (
   id TEXT PRIMARY KEY,
   created_at TEXT NOT NULL,
   candidates TEXT NOT NULL,
-  empty_categories TEXT NOT NULL DEFAULT '[]'
+  empty_categories TEXT NOT NULL DEFAULT '[]',
+  discovered TEXT NOT NULL DEFAULT '[]'
 );
 CREATE TABLE IF NOT EXISTS vote (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,7 +58,15 @@ export function openDb(file: string): Db {
   const db = new Database(file);
   db.pragma("foreign_keys = ON");
   db.exec(SCHEMA);
+  migrate(db);
   return db;
+}
+
+/** Bring a database created by an older build up to the current schema. Idempotent. */
+function migrate(db: Db): void {
+  const cols = (db.prepare("PRAGMA table_info(run)").all() as { name: string }[]).map((c) => c.name);
+  // Contract v2: agent-found activities are stored with the run.
+  if (!cols.includes("discovered")) db.exec("ALTER TABLE run ADD COLUMN discovered TEXT NOT NULL DEFAULT '[]'");
 }
 
 // Cached on globalThis so Next dev hot reloads don't open a second connection.
@@ -149,7 +158,7 @@ export function upsertRating(db: Db, eventId: string, memberId: string, score: n
 
 // ---- runs ------------------------------------------------------------------
 
-interface RunRow { id: string; created_at: string; candidates: string; empty_categories: string }
+interface RunRow { id: string; created_at: string; candidates: string; empty_categories: string; discovered: string }
 
 function toRun(r: RunRow): Run {
   return {
@@ -157,15 +166,17 @@ function toRun(r: RunRow): Run {
     createdAt: r.created_at,
     candidates: JSON.parse(r.candidates) as Candidate[],
     emptyCategories: JSON.parse(r.empty_categories) as Category[],
+    discovered: JSON.parse(r.discovered) as Activity[],
   };
 }
 
 export function saveRun(db: Db, run: Run): void {
-  db.prepare("INSERT INTO run (id, created_at, candidates, empty_categories) VALUES (?, ?, ?, ?)").run(
+  db.prepare("INSERT INTO run (id, created_at, candidates, empty_categories, discovered) VALUES (?, ?, ?, ?, ?)").run(
     run.id,
     run.createdAt,
     JSON.stringify(run.candidates),
     JSON.stringify(run.emptyCategories),
+    JSON.stringify(run.discovered),
   );
 }
 
