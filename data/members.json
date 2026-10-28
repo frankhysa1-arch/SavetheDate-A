@@ -1,0 +1,8 @@
+[
+  { "id": "jega", "name": "Jega", "categories": ["games", "sports", "drinks"], "tags": ["games-spin-sf-ping-pong", "sports-k1-speed-go-karts"], "constraints": { "diet": "vegetarian" } },
+  { "id": "gabriel", "name": "Gabriel", "categories": ["sports", "outdoor", "dining"], "tags": ["sports-presidio-golf-course", "sports-mariners-point-driving-range"], "constraints": {} },
+  { "id": "lucas", "name": "Lucas", "categories": ["drinks", "games", "culture"], "tags": ["drinks-schroeders-happy-hour", "games-urban-putt"], "constraints": { "noAlcohol": true } },
+  { "id": "romain", "name": "Romain", "categories": ["dining", "culture", "creative"], "tags": ["creative-pottery-workshop", "dining-pizzeria-delfina"], "constraints": { "diet": "no-pork" } },
+  { "id": "frank", "name": "Frank", "categories": ["sports", "drinks", "outdoor"], "tags": ["sports-presidio-golf-course", "sports-run-club", "drinks-zeitgeist-happy-hour"], "constraints": { "mobility": "none" } },
+  { "id": "sky", "name": "Sky", "categories": ["creative", "wellness", "outdoor"], "tags": ["creative-arts-and-crafts-night", "wellness-kabuki-springs"], "constraints": {} }
+]
