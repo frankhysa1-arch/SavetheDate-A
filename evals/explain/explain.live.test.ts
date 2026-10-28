@@ -8,10 +8,10 @@ import { describe, expect, it } from "vitest";
 import { CASES } from "./cases";
 import { failures, gradeEnvelope, gradeText, type GradeResult } from "./graders";
 import { judge, type JudgeScores } from "./judge";
-import { runExplain } from "./adapter";
+import { HAS_EXPLAIN, runExplain } from "./adapter";
 import { WORLD } from "./world";
 
-const LIVE = process.env.EVAL_LIVE === "1" && !!process.env.ANTHROPIC_API_KEY;
+const LIVE = process.env.EVAL_LIVE === "1" && !!process.env.ANTHROPIC_API_KEY && HAS_EXPLAIN;
 const RUNS = Number(process.env.EVAL_RUNS ?? 3);
 const JUDGE = process.env.EVAL_JUDGE === "1";
 

@@ -10,7 +10,7 @@ vi.mock("@anthropic-ai/sdk", () => {
   return { default: Anthropic, Anthropic };
 });
 
-import { runExplain } from "./adapter";
+import { HAS_EXPLAIN, runExplain } from "./adapter";
 
 /** Tool-use response in the shape the SDK returns. Assumes the tool input is `{ explanations: [{id, explanation}] }`. */
 const toolReply = (explanations: unknown[]) => ({ stop_reason: "tool_use", content: [{ type: "tool_use", id: "t1", name: "submit_explanations", input: { explanations } }] });
@@ -19,7 +19,7 @@ const one = (): Candidate[] => structuredClone(CASES[0].candidates);
 
 beforeEach(() => { create.mockReset(); process.env.ANTHROPIC_API_KEY = "test-key"; });
 
-describe("template fallback (no API key)", () => {
+describe.skipIf(!HAS_EXPLAIN)("template fallback (no API key)", () => {
   beforeEach(() => { delete process.env.ANTHROPIC_API_KEY; });
 
   it("never calls the API and fills every explanation", async () => {
@@ -40,6 +40,12 @@ describe("template fallback (no API key)", () => {
     });
   }
 
+  it("fills discovered (disc:) activities from ctx and flags the estimate", async () => {
+    const c = CASES.find((x) => x.name === "discovered-activity")!;
+    const out = await runExplain(structuredClone(c.candidates));
+    expect(out[0].explanation).toMatch(/estimat|about|around|approx|roughly|~/i);
+  });
+
   it("is deterministic", async () => {
     const a = await runExplain(structuredClone(CASES[2].candidates));
     const b = await runExplain(structuredClone(CASES[2].candidates));
@@ -58,7 +64,7 @@ describe("template fallback (no API key)", () => {
   });
 });
 
-describe("Claude path (mocked SDK)", () => {
+describe.skipIf(!HAS_EXPLAIN)("Claude path (mocked SDK)", () => {
   it("sends model, max_tokens and a forced tool; merges only explanations", async () => {
     const input = one();
     create.mockResolvedValue(toolReply([{ id: input[0].id, explanation: "Bouldering at €18 each; Ana, Ben and Chloe all picked it.", price: 1, score: 0.99 }]));

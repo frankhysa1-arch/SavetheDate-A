@@ -31,7 +31,7 @@ const ALL = MEMBERS.map((x) => x.id);
 let seq = 0;
 export function cand(over: Partial<Candidate> & { activityId: string }): Candidate {
   seq += 1;
-  const act = ACTIVITIES.find((a) => a.id === over.activityId)!;
+  const act = (ACTIVITIES.find((a) => a.id === over.activityId) ?? DISCOVERED.find((a) => a.id === over.activityId))!;
   return {
     id: `c${seq}`,
     slotStart: "2026-11-05T17:30:00.000Z",
