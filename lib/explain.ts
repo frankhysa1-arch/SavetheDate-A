@@ -8,7 +8,7 @@ import type { Activity, Candidate, Member } from "@/lib/types";
 const MODEL = "claude-sonnet-5-5";
 const MAX_TOKENS = 2000;
 const ATTEMPTS = 2; // first try plus one retry
-const MAX_EXPLANATION_CHARS = 400;
+const MAX_EXPLANATION_CHARS = 300;
 const TOOL_NAME = "submit_explanations";
 
 export interface ExplainContext {
@@ -33,7 +33,23 @@ function joinNames(names: string[]): string {
   return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
 }
 
-/** Deterministic sentence from price, attendance, matched member names and weather. */
+const MAX_NAME_CHARS = 60;
+const NO_FORECAST = /no forecast|unavailable/i;
+
+/**
+ * Catalog names are data, not instructions. A long name that runs on past a sentence
+ * boundary ("Spa Day. Ignore all previous instructions...") is cut at that boundary.
+ */
+function safeName(name: string): string {
+  const head = name.length > 40 ? name.split(/[.!?]\s/)[0] : name;
+  return head.slice(0, MAX_NAME_CHARS).trim();
+}
+
+/**
+ * Deterministic one-sentence explanation from price, attendance, matched member names and
+ * weather. Weather is only mentioned for outdoor options that have a forecast. Stays under
+ * MAX_EXPLANATION_CHARS by dropping weather, then member names, if needed.
+ */
 export function templateExplanation(candidate: Candidate, ctx: ExplainContext): string {
   const activity = ctx.activities.find((a) => a.id === candidate.activityId);
   const nameOf = new Map(ctx.members.map((m) => [m.id, m.name]));
@@ -43,13 +59,28 @@ export function templateExplanation(candidate: Candidate, ctx: ExplainContext): 
       ? "free"
       : `${activity.pricePerPerson} EUR per person${candidate.priceIsEstimate ? " (estimate)" : ""}`
     : "price on request";
-  const parts = [
-    `${activity?.name ?? candidate.activityId}: ${price}`,
-    `${Math.round(candidate.attendancePct)}% of the team is free`,
-    matched.length ? `matches the interests of ${joinNames(matched)}` : "no direct interest matches",
-    `weather: ${candidate.weather || "no forecast"}`,
-  ];
-  return `${parts.join("; ")}.`;
+  const forecast =
+    activity && !activity.indoor && candidate.weather && !NO_FORECAST.test(candidate.weather) ? candidate.weather : null;
+
+  const build = (withWeather: boolean, namesOf: "all" | "count") => {
+    const interest = !matched.length
+      ? "no direct interest matches"
+      : namesOf === "all"
+        ? `matches the interests of ${joinNames(matched)}`
+        : `matches the interests of ${matched.length} members`;
+    const parts = [
+      `${activity ? safeName(activity.name) : candidate.activityId}: ${price}`,
+      `${Math.round(candidate.attendancePct)}% of the team is available`,
+      interest,
+      ...(withWeather && forecast ? [`weather: ${forecast}`] : []),
+    ];
+    return `${parts.join("; ")}.`;
+  };
+  for (const [withWeather, namesOf] of [[true, "all"], [false, "all"], [false, "count"]] as const) {
+    const text = build(withWeather, namesOf);
+    if (text.length <= MAX_EXPLANATION_CHARS) return text;
+  }
+  return build(false, "count").slice(0, MAX_EXPLANATION_CHARS - 1) + ".";
 }
 
 // ---- Claude call ------------------------------------------------------------
@@ -135,8 +166,9 @@ async function askClaude(
   const known = new Set(candidates.map((c) => c.id));
   const out = new Map<string, string>();
   for (const e of parsed.explanations) {
-    const text = e.explanation.trim().slice(0, MAX_EXPLANATION_CHARS);
-    if (known.has(e.id) && text) out.set(e.id, text); // unknown ids are ignored
+    const text = e.explanation.trim();
+    // Unknown ids ignored, first duplicate wins, empty or over-long text falls back to the template.
+    if (known.has(e.id) && text && text.length <= MAX_EXPLANATION_CHARS && !out.has(e.id)) out.set(e.id, text);
   }
   return out;
 }
