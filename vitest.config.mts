@@ -7,9 +7,11 @@ const root = fileURLToPath(new URL(".", import.meta.url));
 
 /**
  * Two test projects:
- *  - "node":  tests/**\/*.test.ts   (engine, backend, types). Default environment.
- *  - "jsdom": tests/**\/*.test.tsx  (React components), with jest-dom matchers
+ *  - "node":  **\/*.test.ts   (engine, backend, types). Default environment.
+ *  - "jsdom": **\/*.test.tsx  (React components), with jest-dom matchers
  *             and RTL cleanup from tests/setup-dom.ts.
+ * Tests are discovered anywhere in the repo (node_modules excluded), so
+ * colocated tests such as components/Foo.test.tsx also run.
  *
  * `environmentMatchGlobs` no longer exists in Vitest 5, hence `projects`.
  * Per-file override also works: put `// @vitest-environment jsdom` as the
@@ -27,7 +29,7 @@ export default defineConfig({
         test: {
           name: "node",
           environment: "node",
-          include: ["tests/**/*.test.ts"],
+          include: ["**/*.test.ts"],
         },
       },
       {
@@ -35,7 +37,7 @@ export default defineConfig({
         test: {
           name: "jsdom",
           environment: "jsdom",
-          include: ["tests/**/*.test.tsx"],
+          include: ["**/*.test.tsx"],
           setupFiles: ["./tests/setup-dom.ts"],
         },
       },

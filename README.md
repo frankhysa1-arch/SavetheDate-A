@@ -12,5 +12,5 @@ npm run dev                  # http://localhost:3000
 
 Other scripts: `npm test` (Vitest), `npm run typecheck` (tsc), `npm run build`.
 
-Tests live in `tests/`: `*.test.ts` runs in Node, `*.test.tsx` runs in jsdom with Testing Library.
+Tests: any `*.test.ts` runs in Node, any `*.test.tsx` runs in jsdom with Testing Library (see `vitest.config.mts`).
 See `workstreams/CONTRACT.md` for the shared types, API and file ownership.
