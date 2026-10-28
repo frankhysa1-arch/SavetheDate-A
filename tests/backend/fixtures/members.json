@@ -1,0 +1,6 @@
+[
+  { "id": "m1", "name": "Alice", "categories": ["dining", "games"], "tags": ["board-game-cafe"], "constraints": { "diet": "vegetarian" } },
+  { "id": "m2", "name": "Bruno", "categories": ["dining", "outdoor"], "tags": [], "constraints": { "mobility": "none" } },
+  { "id": "m3", "name": "Chen", "categories": ["games", "culture"], "tags": ["escape-room"], "constraints": { "noAlcohol": true } },
+  { "id": "m4", "name": "Dana", "categories": ["outdoor", "sports"], "tags": [], "constraints": {} }
+]

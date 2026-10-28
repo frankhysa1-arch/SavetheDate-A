@@ -1,0 +1,8 @@
+[
+  { "id": "a-bistro", "name": "Bistro Lunch", "category": "dining", "tags": [], "indoor": true, "pricePerPerson": 28, "priceIsEstimate": false, "sourceUrl": "https://example.com/bistro" },
+  { "id": "a-bowling", "name": "Bowling Night", "category": "sports", "tags": [], "indoor": true, "pricePerPerson": 18, "priceIsEstimate": false, "sourceUrl": "https://example.com/bowling" },
+  { "id": "a-escape", "name": "Escape Room", "category": "games", "tags": ["escape-room"], "indoor": true, "pricePerPerson": 24, "priceIsEstimate": true, "sourceUrl": "https://example.com/escape" },
+  { "id": "a-hike", "name": "Forest Hike", "category": "outdoor", "tags": [], "indoor": false, "pricePerPerson": 0, "priceIsEstimate": false, "sourceUrl": "https://example.com/hike" },
+  { "id": "a-museum", "name": "Museum Visit", "category": "culture", "tags": [], "indoor": true, "pricePerPerson": 15, "priceIsEstimate": false, "sourceUrl": "https://example.com/museum" },
+  { "id": "a-pottery", "name": "Pottery Workshop", "category": "creative", "tags": [], "indoor": true, "pricePerPerson": 35, "priceIsEstimate": true, "sourceUrl": "https://example.com/pottery" }
+]
