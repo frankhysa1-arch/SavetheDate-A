@@ -1,0 +1,198 @@
+[
+  {
+    "date": "2026-10-28",
+    "rainPct": 80,
+    "tempC": 11,
+    "windKmh": 22,
+    "summary": "Heavy rain"
+  },
+  {
+    "date": "2026-10-29",
+    "rainPct": 25,
+    "tempC": 14,
+    "windKmh": 18,
+    "summary": "Partly cloudy"
+  },
+  {
+    "date": "2026-10-30",
+    "rainPct": 35,
+    "tempC": 13,
+    "windKmh": 26,
+    "summary": "Breezy, light drizzle possible"
+  },
+  {
+    "date": "2026-10-31",
+    "rainPct": 5,
+    "tempC": 19,
+    "windKmh": 10,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-01",
+    "rainPct": 10,
+    "tempC": 16,
+    "windKmh": 14,
+    "summary": "Mostly sunny"
+  },
+  {
+    "date": "2026-11-02",
+    "rainPct": 25,
+    "tempC": 14,
+    "windKmh": 18,
+    "summary": "Partly cloudy"
+  },
+  {
+    "date": "2026-11-03",
+    "rainPct": 35,
+    "tempC": 13,
+    "windKmh": 26,
+    "summary": "Breezy, light drizzle possible"
+  },
+  {
+    "date": "2026-11-04",
+    "rainPct": 5,
+    "tempC": 17,
+    "windKmh": 12,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-05",
+    "rainPct": 10,
+    "tempC": 16,
+    "windKmh": 14,
+    "summary": "Mostly sunny"
+  },
+  {
+    "date": "2026-11-06",
+    "rainPct": 25,
+    "tempC": 14,
+    "windKmh": 18,
+    "summary": "Partly cloudy"
+  },
+  {
+    "date": "2026-11-07",
+    "rainPct": 35,
+    "tempC": 13,
+    "windKmh": 26,
+    "summary": "Breezy, light drizzle possible"
+  },
+  {
+    "date": "2026-11-08",
+    "rainPct": 5,
+    "tempC": 19,
+    "windKmh": 10,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-09",
+    "rainPct": 10,
+    "tempC": 16,
+    "windKmh": 14,
+    "summary": "Mostly sunny"
+  },
+  {
+    "date": "2026-11-10",
+    "rainPct": 25,
+    "tempC": 14,
+    "windKmh": 18,
+    "summary": "Partly cloudy"
+  },
+  {
+    "date": "2026-11-11",
+    "rainPct": 5,
+    "tempC": 17,
+    "windKmh": 12,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-12",
+    "rainPct": 5,
+    "tempC": 19,
+    "windKmh": 10,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-13",
+    "rainPct": 10,
+    "tempC": 16,
+    "windKmh": 14,
+    "summary": "Mostly sunny"
+  },
+  {
+    "date": "2026-11-14",
+    "rainPct": 25,
+    "tempC": 14,
+    "windKmh": 18,
+    "summary": "Partly cloudy"
+  },
+  {
+    "date": "2026-11-15",
+    "rainPct": 35,
+    "tempC": 13,
+    "windKmh": 26,
+    "summary": "Breezy, light drizzle possible"
+  },
+  {
+    "date": "2026-11-16",
+    "rainPct": 5,
+    "tempC": 19,
+    "windKmh": 10,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-17",
+    "rainPct": 10,
+    "tempC": 16,
+    "windKmh": 14,
+    "summary": "Mostly sunny"
+  },
+  {
+    "date": "2026-11-18",
+    "rainPct": 5,
+    "tempC": 17,
+    "windKmh": 12,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-19",
+    "rainPct": 35,
+    "tempC": 13,
+    "windKmh": 26,
+    "summary": "Breezy, light drizzle possible"
+  },
+  {
+    "date": "2026-11-20",
+    "rainPct": 5,
+    "tempC": 19,
+    "windKmh": 10,
+    "summary": "Clear"
+  },
+  {
+    "date": "2026-11-21",
+    "rainPct": 10,
+    "tempC": 16,
+    "windKmh": 14,
+    "summary": "Mostly sunny"
+  },
+  {
+    "date": "2026-11-22",
+    "rainPct": 25,
+    "tempC": 14,
+    "windKmh": 18,
+    "summary": "Partly cloudy"
+  },
+  {
+    "date": "2026-11-23",
+    "rainPct": 35,
+    "tempC": 13,
+    "windKmh": 26,
+    "summary": "Breezy, light drizzle possible"
+  },
+  {
+    "date": "2026-11-24",
+    "rainPct": 5,
+    "tempC": 19,
+    "windKmh": 10,
+    "summary": "Clear"
+  }
+]

@@ -5,27 +5,11 @@
 // then free. Groups are 3 of 6, so Tue and Thu sit at 50%, below the 55% threshold.
 import fs from "node:fs";
 import path from "node:path";
+import { parts, zonedToMs } from "./tz.mjs";
 
-const TZ = "America/Los_Angeles";
 const GROUP_A = ["jega", "gabriel", "lucas"];
 const GROUP_B = ["romain", "frank", "sky"];
 const days = Number(process.argv[2] ?? 28);
-
-const fmt = new Intl.DateTimeFormat("en-US", {
-  timeZone: TZ, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric",
-  hour: "numeric", minute: "numeric", second: "numeric",
-});
-const parts = (ms) => Object.fromEntries(fmt.formatToParts(ms).map((p) => [p.type, Number(p.value)]));
-const offsetMs = (ms) => {
-  const p = parts(ms);
-  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(ms / 1000) * 1000;
-};
-/** Local wall-clock time in TZ to UTC ms. Re-checks the offset once to survive DST edges. */
-function zonedToMs(y, mo, d, h, mi) {
-  const guess = Date.UTC(y, mo - 1, d, h, mi);
-  const ms = guess - offsetMs(guess);
-  return guess - offsetMs(ms);
-}
 
 const today = parts(Date.now());
 const busy = Object.fromEntries([...GROUP_A, ...GROUP_B].map((id) => [id, []]));
