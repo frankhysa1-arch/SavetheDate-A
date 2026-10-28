@@ -1,0 +1,5 @@
+[
+  { "id": "e1", "activityId": "sports-pickleball-moscone", "start": "2026-08-26T18:00:00-07:00", "end": "2026-08-26T20:00:00-07:00" },
+  { "id": "e2", "activityId": "games-spin-sf-ping-pong", "start": "2026-09-30T18:00:00-07:00", "end": "2026-09-30T20:00:00-07:00" },
+  { "id": "e3", "activityId": "drinks-schroeders-happy-hour", "start": "2026-10-14T17:30:00-07:00", "end": "2026-10-14T19:30:00-07:00" }
+]
