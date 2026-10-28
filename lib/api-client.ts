@@ -272,6 +272,7 @@ export const api = {
       createdAt: new Date().toISOString(),
       candidates: clone(kept),
       emptyCategories: CATEGORIES.filter((cat) => !present.has(cat)),
+      discovered: clone(s.baseRun.discovered ?? []), // contract v2: activities the agent found
     };
     return clone(s.run);
   },

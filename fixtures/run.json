@@ -2,6 +2,7 @@
   "id": "run-1",
   "createdAt": "2026-10-29T09:00:00.000Z",
   "emptyCategories": ["creative", "wellness"],
+  "discovered": [],
   "candidates": [
     {
       "id": "cand-ramen", "activityId": "act-ramen",
