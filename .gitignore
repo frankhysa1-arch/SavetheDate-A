@@ -39,3 +39,7 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# eval run output
+evals/explain/results/
+evals/agent/results/
