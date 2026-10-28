@@ -1,6 +1,6 @@
-# Eval: `explain()` (Workstream B, the only Claude call in the system)
+# Eval: `explain()` (Workstream B, fallback explanations)
 
-Scope: `lib/explain.ts`, `explain(candidates) → candidates` with `explanation` filled. Claude may only write that one field, and only from facts it was given. Everything else (rules, scoring, tally) is deterministic and covered by unit tests, not evals.
+Scope: `lib/explain.ts`, `explain(candidates) → candidates` with `explanation` filled. **Since contract v2 the planning agent (stream A, see `../agent/`) writes explanations on the happy path; `explain()` runs only when `AgentResult.mode === "fallback"` and for any candidate whose explanation is still `""`.** It must still handle every candidate shape the engine can emit, including `disc:` (discovered) activities. Claude may only write that one field, and only from facts it was given. Rules, scoring and tally are deterministic and covered by unit tests, not evals.
 
 ## What is measured
 
@@ -34,7 +34,7 @@ Faithful, useful, concise, tone, 1–5 each against the candidate's facts. Relea
 
 ## Dataset (`cases.ts`, `world.ts`)
 
-11 cases / 41 candidates: indoor, outdoor good weather, estimated price, price = limit with attendance = 55%, everyone matched, unicode member name, no forecast, category penalty, **prompt injection in a venue name**, two slots of one activity, a 24-candidate full run. The world is self-contained, independent of `data/*.json`.
+12 cases / 42 candidates: indoor, outdoor good weather, estimated price, price = limit with attendance = 55%, everyone matched, unicode member name, no forecast, category penalty, **prompt injection in a venue name**, two slots of one activity, a 24-candidate full run, and a **discovered activity** (`disc:` id resolved from `ctx.discovered`). The world is self-contained, independent of `data/*.json`.
 
 ## Release thresholds (live)
 
@@ -42,9 +42,14 @@ Hard-grader pass rate 100% over all runs · fallback rate ≤10% (explanations i
 
 ## Prerequisites / decisions for stream B
 
-1. **Signature.** The contract says `explain(candidates)`, but a `Candidate` has no activity name, price or member names, which both the template and the prompt need. The eval assumes `explain(candidates, ctx?: { activities, members })` with `ctx` defaulting to the catalog and DB. Needs a contract PR. If B chooses another injection style, change only `adapter.ts`.
+1. **Signature.** The contract says `explain(candidates)`, but a `Candidate` has no activity name, price or member names, which both the template and the prompt need. The eval assumes `explain(candidates, ctx?: { activities, members, discovered? })` with `ctx` defaulting to the catalog, DB and `Run.discovered` (v2: `resolveActivity(id, catalog, discovered)`). Needs a contract PR. If B chooses another injection style, change only `adapter.ts`.
 2. **Tool shape.** Offline mocks assume one forced tool whose input is `{ explanations: [{ id, explanation }] }`. Adjust `toolReply` in `explain.offline.test.ts` if B names it differently.
 3. **Runtime validator (recommended, one `it.todo`).** The imp_plan validates only schema. Running H3/H4/H5/H9 in production and templating any failing id closes the hallucination gap; `graders.ts` is reusable for that.
+
+## Notes
+
+- Graders H2 (≤300 chars) now match the agent's explanation trim, so one grader set serves both suites.
+- The suite skips with a visible reason until `lib/explain.ts` exists; it no longer breaks `npm test` before stream B lands.
 
 ## Extending
 

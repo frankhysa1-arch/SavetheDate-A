@@ -42,3 +42,4 @@ next-env.d.ts
 
 # eval run output
 evals/explain/results/
+evals/agent/results/
