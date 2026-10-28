@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CATEGORIES, CandidateSchema, type Candidate } from "@/lib/types";
+import { CATEGORIES, CandidateSchema, type AgentResult, type Candidate, type Run } from "@/lib/types";
 
 const valid: Candidate = {
   id: "cand-1",
@@ -35,5 +35,14 @@ describe("lib/types", () => {
     expect(CandidateSchema.safeParse(badCriteria).success).toBe(false);
 
     expect(CandidateSchema.safeParse({ ...valid, score: 1.5 }).success).toBe(false);
+  });
+
+  it("Run and AgentResult carry discovered activities", () => {
+    const run: Run = { id: "r1", createdAt: "2026-11-01T00:00:00.000Z", candidates: [valid], emptyCategories: [], discovered: [] };
+    const result: AgentResult = {
+      candidates: [valid], emptyCategories: [], discovered: [],
+      mode: "fallback", trace: [], usage: { toolCalls: 0, inputTokens: 0, outputTokens: 0 }, gaps: [],
+    };
+    expect(run.discovered).toEqual(result.discovered);
   });
 });
