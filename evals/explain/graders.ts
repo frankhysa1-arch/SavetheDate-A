@@ -1,10 +1,12 @@
 import { isDeepStrictEqual } from "node:util";
 import { CandidateSchema, type Candidate } from "@/lib/types";
 import type { World } from "./world";
+export { findAct };
 
 export interface GradeResult { id: string; pass: boolean; detail?: string }
 
-const MAX_CHARS = 300;
+const MAX_CHARS = 300; // contract v2: the agent trims explanations to 300 chars
+const findAct = (w: World, id: string) => w.activities.find((a) => a.id === id) ?? w.discovered?.find((a) => a.id === id);
 const MAX_SENTENCES = 2;
 const norm = (n: string) => String(Number(n.replace(",", ".")));
 const numbers = (s: string) => (s.match(/\d+(?:[.,]\d+)?/g) ?? []).map(norm);
@@ -13,7 +15,7 @@ const wordRe = (w: string) => new RegExp(`(?<![\\p{L}\\p{N}])${esc(w)}(?![\\p{L}
 
 /** Numbers an explanation may legitimately contain, derived only from the candidate and world. */
 export function allowedNumbers(c: Candidate, w: World): Set<string> {
-  const act = w.activities.find((a) => a.id === c.activityId);
+  const act = findAct(w, c.activityId);
   const s = new Set<string>();
   const add = (n: number | string) => s.add(norm(String(n)));
   if (act) add(act.pricePerPerson);
@@ -28,7 +30,7 @@ const sentences = (t: string) => t.split(/[.!?]+(?:\s|$)/).filter((x) => x.trim(
 
 /** Deterministic graders for one explanation. All are HARD (must pass 100%). */
 export function gradeText(c: Candidate, text: string, w: World): GradeResult[] {
-  const act = w.activities.find((a) => a.id === c.activityId)!;
+  const act = findAct(w, c.activityId)!;
   const r: GradeResult[] = [];
   const check = (id: string, pass: boolean, detail?: string) => r.push({ id, pass, ...(pass ? {} : { detail }) });
 

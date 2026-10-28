@@ -19,8 +19,13 @@ export const MEMBERS: Member[] = [
   m("m5", "Elena Rossi"), m("m6", "Farid Haddad"), m("m7", "Gustavo Lima"), m("m8", "Hana Åström"),
 ];
 
-export interface World { activities: Activity[]; members: Member[] }
-export const WORLD: World = { activities: ACTIVITIES, members: MEMBERS };
+/** Contract v2: activities found by the planning agent in the same run (ids "disc:<10 hex>"), resolved via Run.discovered. */
+export const DISCOVERED: Activity[] = [
+  { id: "disc:3fa9c21b7e", name: "Hidden Sauna Loft", category: "wellness", tags: [], indoor: true, pricePerPerson: 25, priceIsEstimate: true, sourceUrl: "https://example.org/sauna" },
+];
+
+export interface World { activities: Activity[]; members: Member[]; discovered?: Activity[] }
+export const WORLD: World = { activities: ACTIVITIES, members: MEMBERS, discovered: DISCOVERED };
 
 const ALL = MEMBERS.map((x) => x.id);
 let seq = 0;

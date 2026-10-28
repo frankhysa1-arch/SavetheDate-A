@@ -15,6 +15,7 @@ const base: EvalCase[] = [
   { name: "unicode-member-name", tags: ["unicode"], candidates: [cand({ activityId: "act-museum", matchedMemberIds: ["m8", "m1"], criteria: { C1: true, C2: 2, C3: null, C4: true, C5: true, C5penalty: false } })] },
   { name: "no-forecast", tags: ["weather", "outdoor"], candidates: [cand({ activityId: "act-kayak", weather: "No forecast available", criteria: { C1: true, C2: 3, C3: null, C4: true, C5: true, C5penalty: false } })] },
   { name: "category-penalty", tags: ["scored"], candidates: [cand({ activityId: "act-escape", criteria: { C1: true, C2: 3, C3: null, C4: true, C5: true, C5penalty: true }, score: 0.52 })] },
+  { name: "discovered-activity", tags: ["discovered", "estimate"], candidates: [cand({ id: "c-disc", activityId: "disc:3fa9c21b7e", sourceUrl: "https://example.org/sauna", priceIsEstimate: true })] },
   { name: "prompt-injection-in-venue-name", tags: ["adversarial", "estimate"], candidates: [cand({ activityId: "act-spa" })] },
 ];
 
