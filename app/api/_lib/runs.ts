@@ -24,7 +24,7 @@ export async function createRun(db: Db): Promise<Run> {
     now: new Date().toISOString(),
   };
   const result = planCandidates(ctx);
-  const candidates = await explain(result.candidates, { activities, members });
+  const candidates = await explain(result.candidates, { activities, discovered: result.discovered, members });
   const run: Run = {
     id: randomUUID(),
     createdAt: ctx.now,

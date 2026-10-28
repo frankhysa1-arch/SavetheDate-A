@@ -13,7 +13,14 @@ const TOOL_NAME = "submit_explanations";
 
 export interface ExplainContext {
   activities: readonly Activity[];
+  /** Contract v2: agent-found activities from `Run.discovered`, looked up after the catalog. */
+  discovered?: readonly Activity[];
   members: readonly Pick<Member, "id" | "name">[];
+}
+
+/** Catalog first, then discovered (same order as `resolveActivity`). */
+function findActivity(ctx: ExplainContext, id: string): Activity | undefined {
+  return ctx.activities.find((a) => a.id === id) ?? ctx.discovered?.find((a) => a.id === id);
 }
 
 /** The slice of the SDK this module uses, so tests can inject a fake. */
@@ -51,7 +58,7 @@ function safeName(name: string): string {
  * MAX_EXPLANATION_CHARS by dropping weather, then member names, if needed.
  */
 export function templateExplanation(candidate: Candidate, ctx: ExplainContext): string {
-  const activity = ctx.activities.find((a) => a.id === candidate.activityId);
+  const activity = findActivity(ctx, candidate.activityId);
   const nameOf = new Map(ctx.members.map((m) => [m.id, m.name]));
   const matched = candidate.matchedMemberIds.map((id) => nameOf.get(id) ?? id);
   const price = activity
@@ -122,7 +129,7 @@ const TOOL = {
 
 function claudeInput(candidates: readonly Candidate[], ctx: ExplainContext) {
   return candidates.map((c) => {
-    const a = ctx.activities.find((x) => x.id === c.activityId);
+    const a = findActivity(ctx, c.activityId);
     // Member names stay local: Claude only sees counts.
     return {
       id: c.id,

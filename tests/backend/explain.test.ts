@@ -53,6 +53,13 @@ describe("templateExplanation", () => {
     expect(templateExplanation(crowd, many).length).toBeLessThanOrEqual(300);
   });
 
+  it("resolves discovered activities after the catalog", () => {
+    const disc: Activity = { id: "disc:abc1234567", name: "Rooftop Yoga", category: "wellness", tags: [], indoor: true, pricePerPerson: 15, priceIsEstimate: true, sourceUrl: "https://example.com/yoga" };
+    const cd = candidate("cd", { activityId: disc.id, priceIsEstimate: true });
+    expect(templateExplanation(cd, { ...ctx, discovered: [disc] })).toContain("Rooftop Yoga: 15 EUR per person (estimate)");
+    expect(templateExplanation(cd, ctx)).toContain("price on request"); // not in ctx at all
+  });
+
   it("handles free, estimated, unmatched and unknown activities", () => {
     expect(templateExplanation(c2, ctx)).toContain("Forest Hike: free");
     expect(templateExplanation(c2, ctx)).toContain("no direct interest matches");
