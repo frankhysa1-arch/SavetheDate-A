@@ -6,6 +6,8 @@ import { api, type CandidateView } from "@/lib/api-client";
 import { CATEGORIES, type Category } from "@/lib/types";
 import { CategoryGroup } from "@/components/CategoryGroup";
 import { ErrorBanner } from "@/components/ErrorBanner";
+import { HeroBanner } from "@/components/HeroBanner";
+import { PlannerTheater } from "@/components/PlannerTheater";
 import { Spinner } from "@/components/Spinner";
 import { formatDate } from "@/components/format";
 import { errMsg, useRunData } from "@/components/useRunData";
@@ -55,51 +57,46 @@ export default function PlanPage() {
   const populated = groups.filter((g) => g.items.length > 0).length;
 
   return (
-    <div className="grid gap-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Plan an event</h1>
-          <p className="mt-1 max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
-            One planning run checks every activity against the team&apos;s budget, calendars, weather and history, then
-            shows the best options per category. Remove anything the team should not see, then open the vote.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={runPlanning}
-          disabled={planning}
-          className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
-        >
+    <div className="grid gap-7">
+      <HeroBanner
+        title="Let's plan something"
+        subtitle="One planning run checks every idea against your budget, everyone's calendar, the weather and your history, then picks the best in each category. Remove anything you don't love, then open the vote."
+      >
+        <button type="button" onClick={runPlanning} disabled={planning} className="btn-party">
           {planning ? <Spinner label="Planning" /> : run ? "Run planning again" : "Run planning"}
         </button>
-      </header>
+      </HeroBanner>
 
       {error && <ErrorBanner message={error} onRetry={run ? undefined : reload} />}
+
+      {planning && <PlannerTheater />}
 
       {loading && !run ? (
         <Spinner label="Loading the latest run" />
       ) : !run ? (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-          No planning run yet. Press &quot;Run planning&quot; to build the first shortlist.
-        </p>
+        !planning && (
+          <p className="rounded-2xl border-2 border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+            No planning run yet. Press &quot;Run planning&quot; to build the first shortlist.
+          </p>
+        )
       ) : (
         <>
           <p className="text-sm text-zinc-600 dark:text-zinc-400" aria-live="polite">
-            Run from {formatDate(run.createdAt)}: <strong className="text-foreground">{total}</strong>{" "}
-            {total === 1 ? "option" : "options"} in <strong className="text-foreground">{populated}</strong> of{" "}
+            Run from {formatDate(run.createdAt)}: <strong className="text-[var(--text)]">{total}</strong>{" "}
+            {total === 1 ? "option" : "options"} in <strong className="text-[var(--text)]">{populated}</strong> of{" "}
             {CATEGORIES.length} categories.
             {total > 0 && (
               <>
                 {" "}
                 Ready?{" "}
-                <Link href="/vote" className="font-medium text-emerald-800 underline underline-offset-2 dark:text-emerald-300">
+                <Link href="/vote" className="link-party">
                   Open the vote
                 </Link>
                 .
               </>
             )}
           </p>
-          <div className={`grid gap-8 ${planning ? "opacity-60" : ""}`} aria-busy={planning}>
+          <div className={`grid gap-10 transition-opacity ${planning ? "opacity-40" : ""}`} aria-busy={planning}>
             {groups.map((g) => (
               <CategoryGroup
                 key={g.category ?? "other"}

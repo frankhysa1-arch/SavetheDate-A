@@ -27,7 +27,7 @@ export function StarRating({
             aria-label={`${n} out of 5`}
             disabled={disabled}
             onClick={() => onChange(n)}
-            className={`size-8 rounded-md border text-lg leading-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${
+            className={`size-8 rounded-md border text-lg leading-none focus-visible:ring-2 focus-visible:ring-[var(--tomato)] ${
               on
                 ? "border-amber-400 bg-amber-100 text-amber-700 dark:border-amber-600 dark:bg-amber-900/50 dark:text-amber-300"
                 : "border-zinc-300 bg-white text-zinc-400 hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900"

@@ -28,7 +28,7 @@ describe("CandidateCard", () => {
   it("shows name, price, attendance, matched members by name, weather and explanation", () => {
     render(<CandidateCard candidate={base} names={names} />);
     expect(screen.getByRole("heading", { name: "Guided sunset kayak" })).toBeInTheDocument();
-    expect(screen.getByText("€29")).toBeInTheDocument();
+    expect(screen.getByText("$29")).toBeInTheDocument();
     expect(screen.getByText(/75%/)).toBeInTheDocument();
     expect(screen.getByText("Chloé, Farid")).toBeInTheDocument();
     expect(screen.getByText("Dry, 17 °C, light wind")).toBeInTheDocument();

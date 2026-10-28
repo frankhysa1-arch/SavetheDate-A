@@ -18,7 +18,9 @@ describe("api-client in mock mode", () => {
     const members = await api.listMembers();
     expect(members.length).toBeGreaterThanOrEqual(6);
     expect(members[0]).toEqual({ id: expect.any(String), name: expect.any(String) });
-    expect((await api.getTeam()).limit).toBe(40);
+    const team = await api.getTeam();
+    expect(team.limit).toBe(50);
+    expect(team.currency).toBe("USD");
     const run = await api.latestRun();
     expect(run?.candidates.length).toBeGreaterThan(0);
   });

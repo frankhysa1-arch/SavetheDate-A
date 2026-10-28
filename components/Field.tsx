@@ -38,4 +38,4 @@ export const describedBy = (id: string, hint?: string, error?: string | null) =>
   error ? `${id}-error` : hint ? `${id}-hint` : undefined;
 
 export const inputClass =
-  "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 aria-[invalid=true]:border-red-500 dark:border-zinc-700 dark:bg-zinc-900";
+  "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--tomato)] aria-[invalid=true]:border-red-500 dark:border-zinc-700 dark:bg-zinc-900";

@@ -19,6 +19,11 @@ Mock mode serves `fixtures/` and keeps ratings, votes and removals in memory unt
 4. **A member cannot read their own ballot.** To prefill the vote screen after a reload, add `GET /votes/mine?runId=&memberId=` returning a `Ballot | null`.
 5. **`criteria.C2` is ambiguous.** The type comment and the tests treat it as a share (0.5) while the MVP spec says count. The UI therefore ignores the number and shows `matchedMemberIds.length`. Please fix one meaning in `CONTRACT.md`.
 6. **No organizer role.** The contract has no auth, so the Remove button on `/plan` shows for everyone. Fine for the MVP, worth stating.
+7. **Currency is typed as EUR.** `Team.currency` in `lib/types.ts` is the literal `"EUR"` and `CONTRACT.md` says "EUR per person". The team asked for US dollars. The UI now formats every price with the team's `currency` field (default USD) and the mock data is in dollars, so no screen needs to change. Please widen the type to `"EUR" | "USD"`, update the comment to "per person, in the team currency", and set `"currency": "USD"` in `data/team.json`. Until then, prices show whatever currency the backend sends.
+
+## Holiday theme (frontend only, no API)
+
+The whole UI follows the calendar: colors, floating glyphs, ticker text and the hero headline change to the next upcoming US holiday (Halloween now, Thanksgiving next, then Christmas, New Year's Eve, Valentine's Day, St. Patrick's Day, Easter, Memorial Day weekend, July 4 and Labor Day). `components/holidays.ts` holds the calendar and words, `app/(screens)/holidays.css` the palettes. For demos use the Theme picker in the nav, `?holiday=christmas`, or `?date=2026-11-20` to preview another day.
 
 ## Routes the UI calls
 

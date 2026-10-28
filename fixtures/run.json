@@ -9,7 +9,7 @@
       "attendancePct": 88, "availableMemberIds": ["m1", "m2", "m3", "m4", "m5", "m6", "m8"], "matchedMemberIds": ["m1", "m3", "m5"],
       "weather": "",
       "criteria": { "C1": true, "C2": 3, "C3": null, "C4": true, "C5": true, "C5penalty": false },
-      "score": 0.82, "explanation": "Under budget at 22 euros, three members listed dining, and seven of eight are free on Thursday evening.",
+      "score": 0.82, "explanation": "Under budget at $24, three members listed dining, and seven of eight are free on Thursday evening.",
       "priceIsEstimate": false, "sourceUrl": "https://example.com/ramen-bar"
     },
     {
@@ -18,7 +18,7 @@
       "attendancePct": 75, "availableMemberIds": ["m1", "m3", "m4", "m5", "m6", "m8"], "matchedMemberIds": ["m1", "m5", "m8"],
       "weather": "",
       "criteria": { "C1": true, "C2": 3, "C3": null, "C4": true, "C5": true, "C5penalty": false },
-      "score": 0.71, "explanation": "A Saturday lunch crawl close to the budget limit. Six of eight can come and three share the interest.",
+      "score": 0.71, "explanation": "A relaxed Saturday lunch crawl. Six of eight can come and three share the interest.",
       "priceIsEstimate": false, "sourceUrl": "https://example.com/tapas-crawl"
     },
     {
@@ -27,7 +27,7 @@
       "attendancePct": 88, "availableMemberIds": ["m1", "m2", "m3", "m4", "m5", "m6", "m8"], "matchedMemberIds": ["m1", "m2", "m6"],
       "weather": "",
       "criteria": { "C1": true, "C2": 3, "C3": null, "C4": true, "C5": true, "C5penalty": false },
-      "score": 0.78, "explanation": "Cheap at 18 euros and three members like drinks. Same slot as the ramen option, so the team can only pick one.",
+      "score": 0.78, "explanation": "Cheap at $20 and three members like drinks. Same slot as the ramen option, so the team can only pick one.",
       "priceIsEstimate": false, "sourceUrl": "https://example.com/craft-beer"
     },
     {
@@ -36,7 +36,7 @@
       "attendancePct": 63, "availableMemberIds": ["m1", "m2", "m5", "m6", "m7"], "matchedMemberIds": ["m1", "m6"],
       "weather": "",
       "criteria": { "C1": true, "C2": 2, "C3": null, "C4": true, "C5": true, "C5penalty": true },
-      "score": 0.58, "explanation": "Close to the limit at 38 euros and only five members are free. Ranked lower because the last event was also in this category.",
+      "score": 0.58, "explanation": "Near the top of the budget at $42 and only five members are free. Ranked lower because the last event was also in this category.",
       "priceIsEstimate": false, "sourceUrl": "https://example.com/cocktail-workshop"
     },
     {
@@ -63,7 +63,7 @@
       "attendancePct": 63, "availableMemberIds": ["m1", "m2", "m5", "m6", "m7"], "matchedMemberIds": ["m1", "m7"],
       "weather": "",
       "criteria": { "C1": true, "C2": 2, "C3": null, "C4": true, "C5": true, "C5penalty": false },
-      "score": 0.66, "explanation": "Lowest price on the list. Only two members listed it, so it passes the shared-interest floor but does not score high.",
+      "score": 0.66, "explanation": "Easy on the wallet at $16. Only two members listed it, so it passes the shared-interest floor but does not score high.",
       "priceIsEstimate": false, "sourceUrl": "https://example.com/art-museum"
     },
     {

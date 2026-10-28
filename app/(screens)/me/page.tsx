@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { api, type PastEventView } from "@/lib/api-client";
 import { CATEGORIES, type Category } from "@/lib/types";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { MemberSelect, useMember } from "@/components/MemberProvider";
 import { Spinner } from "@/components/Spinner";
 import { StarRating } from "@/components/StarRating";
 import { TagInput } from "@/components/TagInput";
-import { CATEGORY_LABEL, formatDate } from "@/components/format";
+import { CATEGORY_LABEL, CATEGORY_STYLE, formatDate } from "@/components/format";
 import { errMsg } from "@/components/useRunData";
 
 type Score = 1 | 2 | 3 | 4 | 5;
@@ -103,7 +104,9 @@ export default function MePage() {
     <div className="grid gap-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Your preferences</h1>
+          <h1 className="display text-3xl font-extrabold tracking-tight sm:text-4xl">
+            What are <span className="gradient-text">you</span> into?
+          </h1>
           <p className="mt-1 max-w-prose text-sm text-zinc-600 dark:text-zinc-400">
             Tell the planner what you enjoy. Only you can see your own choices. The team sees averages, never individual
             ratings.
@@ -113,7 +116,7 @@ export default function MePage() {
       </header>
 
       <section aria-labelledby="likes" className="grid gap-5 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 id="likes" className="text-lg font-semibold">
+        <h2 id="likes" className="display text-xl font-extrabold">
           What you like{member ? `, ${member.name}` : ""}
         </h2>
         {membersLoading || loading ? (
@@ -125,21 +128,17 @@ export default function MePage() {
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {CATEGORIES.map((cat) => {
                   const on = categories.includes(cat);
+                  const look = CATEGORY_STYLE[cat];
                   return (
                     <label
                       key={cat}
-                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-emerald-600 ${
-                        on
-                          ? "border-emerald-600 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950"
-                          : "border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
-                      }`}
+                      className={`tile ${on ? "on" : ""}`}
+                      style={{ "--c1": look.from, "--c2": look.to, "--cink": look.ink } as CSSProperties}
                     >
-                      <input
-                        type="checkbox"
-                        checked={on}
-                        onChange={() => toggle(cat)}
-                        className="size-4 accent-emerald-700"
-                      />
+                      <input type="checkbox" checked={on} onChange={() => toggle(cat)} className="sr-only" />
+                      <span className="chip">
+                        <CategoryIcon category={cat} className="size-5" />
+                      </span>
                       {CATEGORY_LABEL[cat]}
                     </label>
                   );
@@ -166,13 +165,13 @@ export default function MePage() {
                 type="button"
                 onClick={save}
                 disabled={saving || !memberId}
-                className="rounded-lg bg-emerald-700 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600"
+                className="btn-party"
               >
                 {saving ? "Saving…" : "Save preferences"}
               </button>
               <p
                 role="status"
-                className={`text-sm font-medium ${status?.ok ? "text-emerald-800 dark:text-emerald-300" : "text-red-700 dark:text-red-300"}`}
+                className={`text-sm font-extrabold ${status?.ok ? "text-[var(--tomato)]" : "text-red-700 dark:text-red-300"}`}
               >
                 {status?.text}
               </p>
@@ -182,7 +181,7 @@ export default function MePage() {
       </section>
 
       <section aria-labelledby="past" className="grid gap-4">
-        <h2 id="past" className="text-lg font-semibold">
+        <h2 id="past" className="display text-xl font-extrabold">
           Rate past events
         </h2>
         {eventsError && <ErrorBanner message={eventsError} onRetry={loadEvents} />}

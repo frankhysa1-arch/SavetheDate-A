@@ -5,10 +5,13 @@ import { api } from "@/lib/api-client";
 import { ErrorBanner } from "@/components/ErrorBanner";
 import { Field, describedBy, inputClass } from "@/components/Field";
 import { Spinner } from "@/components/Spinner";
+import { useCurrency, useTeamRefresh } from "@/components/TeamProvider";
 import { errMsg } from "@/components/useRunData";
 import { toDraft, validateTeam, type TeamDraft as Draft, type TeamErrors as Errors } from "@/components/validateTeam";
 
 export default function SettingsPage() {
+  const currency = useCurrency();
+  const refreshTeam = useTeamRefresh();
   const [draft, setDraft] = useState<Draft | null>(null);
   const [city, setCity] = useState("");
   const [errors, setErrors] = useState<Errors>({});
@@ -53,6 +56,7 @@ export default function SettingsPage() {
         noveltyWeeks: Number(draft.noveltyWeeks),
       });
       setDraft(toDraft(saved));
+      refreshTeam();
       setStatus({ ok: true, text: "Settings saved. They apply to the next planning run." });
     } catch (e) {
       setStatus({ ok: false, text: `Could not save settings. ${errMsg(e)}` });
@@ -74,14 +78,16 @@ export default function SettingsPage() {
   return (
     <div className="grid max-w-xl gap-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Team settings</h1>
+        <h1 className="display text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Set the <span className="gradient-text">rules</span>
+        </h1>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
           The organizer sets the rules every planning run must respect{city ? ` for ${city}` : ""}.
         </p>
       </header>
 
       <form onSubmit={submit} noValidate className="grid gap-5 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-        <Field id="limit" label="Budget per person (EUR)" hint="Options above this price are dropped." error={errors.limit}>
+        <Field id="limit" label={`Budget per person (${currency})`} hint="Options above this price are dropped." error={errors.limit}>
           <input {...f("limit", "Options above this price are dropped.")} type="number" inputMode="decimal" min={1} step="any" value={draft.limit} onChange={(e) => set("limit", e.target.value)} />
         </Field>
         <Field id="windowDays" label="Planning window (days ahead)" hint="How far ahead to look for a slot." error={errors.windowDays}>
@@ -98,13 +104,13 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-lg bg-emerald-700 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-600"
+            className="btn-party"
           >
             {saving ? "Saving…" : "Save settings"}
           </button>
           <p
             role="status"
-            className={`text-sm font-medium ${status?.ok ? "text-emerald-800 dark:text-emerald-300" : "text-red-700 dark:text-red-300"}`}
+            className={`text-sm font-extrabold ${status?.ok ? "text-[var(--tomato)]" : "text-red-700 dark:text-red-300"}`}
           >
             {status?.text}
           </p>
