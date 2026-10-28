@@ -1,16 +1,120 @@
-"# SavetheDate-A" 
+# SavetheDate: Team Social Event Planner
 
-## Getting started
+Web app that turns "what should we do as a team?" into one planning run and one vote. Teammates record preferences and rate past events; a planning agent proposes a rule-checked shortlist across eight categories that fits budget, weather, calendars and history; the team votes; the winner downloads as an `.ics` invite.
 
-Requires Node.js 22.12+.
+**Flow:** preferences → free slots → rule-checked shortlist → vote → invite
+
+Rules are enforced by code, never by the model. Every option passes **C1** cost (≤ per-person limit), **C3** weather (outdoor only), **C4** attendance (≥ 55% free) and **C5** novelty (no repeat within 6 weeks); **C2** shared preference (≥ 2 members) is the floor, and the rest is scored. The app works with no API key (deterministic fallback).
+
+## Status
+
+| Piece | Stream | State |
+| --- | --- | --- |
+| Rules C1–C5, slots, scoring, `planCandidates` | A engine | Landed (`lib/engine/`) |
+| Seed data `data/*.json` | A engine | Pending (only a catalog research skill + validator so far) |
+| Planning agent `runPlanningAgent` (Claude tool loop + validator) | A engine | Pending (`lib/engine/agent/`) |
+| SQLite, all `/api` routes, tally, `.ics`, `explain()` fallback | B backend | Landed; `lib/plan-provider.ts` still points at a test stub until A's data lands |
+| Five screens, `lib/api-client.ts`, fixtures | C frontend | Pending |
+| Evals for the agent and `explain()` | Cross-cutting | Landed, skip until their module exists |
+
+## Quick start
+
+Node.js 22.12+.
 
 ```bash
 npm install
-cp .env.example .env.local   # add ANTHROPIC_API_KEY; never commit it
-npm run dev                  # http://localhost:3000
+cp .env.example .env.local     # optional: ANTHROPIC_API_KEY (never commit it)
+npm run dev                    # http://localhost:3000
 ```
 
-Other scripts: `npm test` (Vitest), `npm run typecheck` (tsc), `npm run build`.
+| Script | What it does |
+| --- | --- |
+| `npm run dev` / `build` / `start` | Next.js 16 dev server, production build, serve |
+| `npm test` | Vitest: `*.test.ts` in Node, `*.test.tsx` in jsdom |
+| `npm run typecheck` | `next typegen && tsc --noEmit` (typegen must run first) |
+| `npx vitest run path/to/file.test.ts` | One file |
 
-Tests: any `*.test.ts` runs in Node, any `*.test.tsx` runs in jsdom with Testing Library (see `vitest.config.mts`).
-See `workstreams/CONTRACT.md` for the shared types, API and file ownership.
+Env: `ANTHROPIC_API_KEY` (optional, enables the agent and Claude explanations), `NEXT_PUBLIC_USE_MOCKS=1` (frontend serves `fixtures/` instead of the API). Anything `NEXT_PUBLIC_*` ships to the browser. Vitest does not read env files, so export variables in the shell for live evals.
+
+## Architecture
+
+Three streams built in parallel against one frozen contract ([`workstreams/CONTRACT.md`](workstreams/CONTRACT.md), v2).
+
+```
+UI (C) ──REST──▶ /api routes (B) ──▶ runPlanningAgent (A)  ──no key / failure──▶ planCandidates (A, pure)
+                    │  SQLite · tally · .ics · explain()        │ Claude tool loop + code validator
+                    └─ explain() fills explanations only on the fallback path
+```
+
+- **Pure engine.** `planCandidates(ctx)` is deterministic: rules, slot finding, scoring (`0.35P + 0.20R + 0.20A + 0.15N + 0.10B`), best 2 per category.
+- **Agent.** Claude searches and explains; code recomputes everything that matters and rejects violations. Agent-found venues get `disc:<sha1(url)[0..10]>` ids and are stored in `Run.discovered`.
+- **Claude never** writes the database, sends invites, or sets `score`, `criteria`, `attendancePct`, `matchedMemberIds` or `weather`.
+- **Privacy.** Members never see others' ratings or `constraints`; only team averages are exposed.
+- **Ties** (votes and shortlist): higher attendance, then lower price.
+
+## Repository map
+
+| Path | Contents |
+| --- | --- |
+| `app/` | Next.js App Router. `api/**` routes (B): members, events, ratings, team, plan, runs, votes, result, result/ics. `(screens)/` reserved for the five screens (C) |
+| `components/`, `fixtures/` | Frontend components and mock data (C) |
+| `lib/types.ts` | Shared types and `CandidateSchema` (zod). Change only via contract PR |
+| `lib/engine/` | `rules.ts`, `slots.ts`, `score.ts`, `time.ts`, `schemas.ts`, `validate-activities.ts`, `index.ts` (`planCandidates`) |
+| `lib/db.ts`, `seed.ts` | SQLite (better-sqlite3, plain SQL), idempotent seed |
+| `lib/explain.ts`, `tally.ts`, `ics.ts`, `plan-provider.ts` | Claude explanations with template fallback, vote tally, RFC 5545 invite, engine import seam |
+| `data/` | `activities.json`, `team.json`, `members.json`, `past-events.json`, `busy.json`, `forecast.json` (git-ignored: `app.db*`) |
+| `tests/` | `engine/` (A), `backend/` (B, with fixtures and plan stub), `types.test.ts`, `setup-dom.ts` |
+| `evals/` | Agent and explain evals (below) |
+| `workstreams/` | `CONTRACT.md` plus `A-engine`, `B-backend`, `C-frontend` implementation plans |
+| `.claude/skills/research-activities/` | Build-time skill that researches real venues and records price provenance for `data/activities.json` |
+| `CLAUDE.md`, `AGENTS.md` | Guidance for Claude Code; `AGENTS.md` is regenerated by `next dev`, commit it |
+
+## Specs and design docs (repo root)
+
+| Document | Role |
+| --- | --- |
+| `Team Social Event Planner - 2h MVP Specification.md` | The spec being built: cut list, rules, data, screens, run flow, acceptance script |
+| `Team Social Event Planner Product & Technical Specification.md` | Full product spec, deferred scope (Entra, Graph, live Places/Events APIs, queue, Postgres) |
+| `Team Social Event Planner - VBD Design and 3-Dev Implementation Plan.md` | Volatility-based decomposition and the original 3-developer split |
+
+## Workstreams
+
+Each stream owns disjoint files, so merges don't conflict. Don't edit another stream's files; change types or the contract only by PR agreed by all three.
+
+| Stream | Branch | Owns |
+| --- | --- | --- |
+| A engine and agent | `ws-a-engine` | `lib/engine/**`, `data/*.json`, `tests/engine/**` |
+| B backend | `ws-b-backend` | `lib/db.ts`, `seed.ts`, `explain.ts`, `tally.ts`, `ics.ts`, `app/api/**`, `tests/backend/**` |
+| C frontend | `ws-c-frontend` | `app/(screens)/**`, `components/**`, `lib/api-client.ts`, `fixtures/**` |
+
+## HTTP API (`/api`)
+
+`GET /members`, `GET|PUT /members/:id`, `GET /events`, `POST /ratings`, `GET|PUT /team`, `POST /plan`, `GET /runs/latest`, `DELETE /runs/:runId/candidates/:candidateId`, `POST /votes`, `GET /votes/tally`, `GET /result`, `GET /result/ics`. Request and response shapes: see the contract.
+
+## Evals
+
+Offline tiers run in `npm test`; suites skip until the module under test exists. Live tiers call Claude and need `EVAL_LIVE=1` plus `ANTHROPIC_API_KEY` in the shell.
+
+| Suite | Checks |
+| --- | --- |
+| `evals/agent/` | Independent oracle recomputes C1–C5, attendance, matches, discovery rules from raw data; scripted cheating model; privacy canary; 9 scenarios; budget, coverage and optional LLM judge |
+| `evals/explain/` | 10 hard graders (grounded numbers, only matched members named, estimate hedged, no links, no injection echo, no invented weather) on template and Claude output |
+
+```bash
+EVAL_LIVE=1 EVAL_RUNS=2 EVAL_JUDGE=1 npx vitest run evals/agent/agent.live.test.ts
+EVAL_LIVE=1 EVAL_RUNS=3 EVAL_JUDGE=1 npx vitest run evals/explain/explain.live.test.ts
+```
+
+Details, thresholds and assumptions: [`evals/agent/README.md`](evals/agent/README.md), [`evals/explain/README.md`](evals/explain/README.md).
+
+## Conventions
+
+- Hard rules (C1, C3 outdoor, C4, C5 same activity) filter; scored rules (C2 count, C5 category penalty) only affect score. Rules are pure functions.
+- `score` is clamped to 0..1.
+- `data/*.json` is read-only seed/config except `team.json`, which `PUT /api/team` rewrites.
+- Only `lib/engine/agent/**` and `lib/explain.ts` may import `@anthropic-ai/sdk`.
+- Commits are per stream and independent.
+
+## Out of scope for the MVP
+
+Auth (Entra), real calendar (Microsoft Graph), payments or booking, multi-team, native or Teams app, Postgres and job queue.
