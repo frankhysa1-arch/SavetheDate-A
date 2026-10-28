@@ -1,4 +1,4 @@
-// Shared contract types. Source of truth: workstreams/CONTRACT.md (frozen).
+// Shared contract types. Source of truth: workstreams/CONTRACT.md (contract v2: agent seam and discovered activities).
 // Change only through a PR to `main` approved by all three stream owners.
 import { z } from "zod";
 
@@ -49,7 +49,7 @@ export interface Candidate {
   weather: string;
   criteria: { C1: boolean; C2: number; C3: boolean | null; C4: boolean; C5: boolean; C5penalty: boolean };
   score: number;                  // 0..1
-  explanation: string;            // "" when produced by the engine, filled by stream B
+  explanation: string;            // "" from planCandidates; filled by the agent (A), or by B's explain() on the fallback path
   priceIsEstimate: boolean; sourceUrl: string;
 }
 
@@ -90,8 +90,28 @@ export interface PlanContext {
   forecastFor: (dateISO: string) => Forecast | null;
   now: string;                    // ISO, injected so tests are deterministic
 }
-export interface PlanResult { candidates: Candidate[]; emptyCategories: Category[] }
+export interface PlanResult {
+  candidates: Candidate[];
+  emptyCategories: Category[];
+  /** Activities referenced by `candidates` that are not in `ctx.activities` (found by the agent). Ids start with `disc:`. Empty for catalog-only and fallback runs. */
+  discovered: Activity[];
+}
 
-export interface Run { id: string; createdAt: string; candidates: Candidate[]; emptyCategories: Category[] }
+export interface ToolCallLog { tool: string; input: unknown; outputSummary: string; ms: number; error?: string }
+export interface AgentUsage { toolCalls: number; inputTokens: number; outputTokens: number }
+/** Result of `runPlanningAgent`. `mode: "fallback"` means `planCandidates` produced it. */
+export interface AgentResult extends PlanResult {
+  mode: "agent" | "fallback";
+  trace: ToolCallLog[];
+  usage: AgentUsage;
+  gaps: string[];                 // sources that failed, rows dropped, caps hit
+}
+
+/** `discovered` must be persisted with the run: an `activityId` resolves in the catalog first, then in `Run.discovered`. */
+export interface Run {
+  id: string; createdAt: string;
+  candidates: Candidate[]; emptyCategories: Category[];
+  discovered: Activity[];
+}
 export interface Ballot { runId: string; memberId: string; ranking: [string, string, string] } // candidate ids, best first
 export interface TallyRow { candidateId: string; points: number; firstChoiceVotes: number }
