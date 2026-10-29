@@ -1,0 +1,1 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,69335,(t,e,n)=>{e.exports={limit:50,currency:"USD",windowDays:14,eventLengthMin:120,attendanceThresholdPct:55,noveltyWeeks:6,city:"San Francisco",timeWindows:[{days:[1,2,3,4,5],start:"17:30",end:"20:00"},{days:[6],start:"12:00",end:"16:00"}]}}]);
